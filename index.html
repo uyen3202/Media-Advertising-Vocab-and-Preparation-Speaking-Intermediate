@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media & Advertising - Interactive Exercises</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        
+        /* Drag & Drop Styles */
+        .drop-zone {
+            min-height: 40px;
+            min-width: 120px;
+            transition: all 0.2s;
+        }
+        .drop-zone.hover { background-color: #dbeafe; border-color: #3b82f6; }
+        .drag-item { cursor: grab; user-select: none; }
+        .drag-item:active { cursor: grabbing; }
+        
+        /* Resizer Styles */
+        .resizer {
+            width: 6px;
+            cursor: col-resize;
+            background-color: #cbd5e1;
+            transition: background-color 0.2s;
+            z-index: 10;
+        }
+        .resizer:hover, .resizer:active { background-color: #3b82f6; }
+        
+        /* Auto-resize Inline Input */
+        .inline-input {
+            border-bottom: 2px solid #3b82f6;
+            background-color: #eff6ff;
+            outline: none;
+            text-align: center;
+            padding: 2px 4px;
+            min-width: 60px;
+            transition: background-color 0.2s;
+            border-radius: 4px 4px 0 0;
+            font-weight: 500;
+        }
+        .inline-input:focus { background-color: #ffffff; border-bottom-color: #2563eb; }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- Header Navigation -->
+    <header class="bg-white shadow-sm z-20 flex-shrink-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <i class="fas fa-book-open text-blue-600 text-2xl"></i>
+                <h1 class="text-xl font-bold text-gray-800">Media & Advertising</h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <i class="fas fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" id="studentName" placeholder="Enter your name..." class="pl-10 pr-4 py-2 border rounded-full bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none w-64 shadow-inner">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Progress Steps -->
+        <div class="bg-blue-50 border-b">
+            <div class="max-w-7xl mx-auto px-4 flex justify-between">
+                <button onclick="goToSection(0)" id="tab-0" class="flex-1 py-3 text-center font-semibold text-blue-600 border-b-2 border-blue-600 transition">1. Reading</button>
+                <button onclick="goToSection(1)" id="tab-1" class="flex-1 py-3 text-center font-medium text-gray-500 hover:text-blue-500 transition">2. Vocabulary</button>
+                <button onclick="goToSection(2)" id="tab-2" class="flex-1 py-3 text-center font-medium text-gray-500 hover:text-blue-500 transition">3. Listening</button>
+                <button onclick="goToSection(3)" id="tab-3" class="flex-1 py-3 text-center font-medium text-gray-500 hover:text-blue-500 transition">4. Speaking</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-hidden relative bg-white" id="mainContainer">
+        
+        <!-- SECTION 1: READING -->
+        <section id="section-0" class="section-container h-full w-full absolute top-0 left-0 transition-opacity duration-300">
+            <div class="flex h-full">
+                <!-- Left Pane: Text -->
+                <div class="h-full overflow-y-auto p-6" style="width: 60%;">
+                    <div id="readingContent1" class="prose max-w-none mb-8">
+                        <!-- Reading text injected by JS -->
+                    </div>
+                    <!-- Vocab Notes -->
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-5 shadow-sm mt-8">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-bold text-yellow-800 flex items-center gap-2">
+                                <i class="fas fa-clipboard-list"></i> Vocab Notes
+                            </h3>
+                            <button onclick="copyNotes()" class="text-xs bg-yellow-200 hover:bg-yellow-300 text-yellow-800 px-3 py-1 rounded transition">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                        </div>
+                        <textarea id="vocabNotes" class="w-full bg-white border border-yellow-300 rounded p-3 h-32 focus:outline-none focus:ring-2 focus:ring-yellow-400" placeholder="Type your vocabulary notes here..."></textarea>
+                    </div>
+                </div>
+                
+                <!-- Resizer -->
+                <div class="resizer flex items-center justify-center relative">
+                    <div class="h-8 w-1 bg-gray-400 rounded-full"></div>
+                </div>
+                
+                <!-- Right Pane: Questions -->
+                <div class="h-full flex-1 overflow-y-auto p-6 bg-gray-50">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6">Reading Questions</h3>
+                    <p class="text-gray-600 mb-6">Answer the following questions based on the text:</p>
+                    <div class="space-y-6">
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                            <label class="font-semibold text-gray-800 block mb-2">1. How did people get information in the past?</label>
+                            <textarea id="read_q1" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-3" rows="3"></textarea>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                            <label class="font-semibold text-gray-800 block mb-2">2. What are media that replaced traditional TV and print media nowadays?</label>
+                            <textarea id="read_q2" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-3" rows="3"></textarea>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                            <label class="font-semibold text-gray-800 block mb-2">3. Why are influencers better at persuading people to buy products than traditional actors?</label>
+                            <textarea id="read_q3" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-3" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: VOCABULARY -->
+        <section id="section-1" class="section-container hidden h-full w-full absolute top-0 left-0 transition-opacity duration-300">
+            <div class="flex h-full">
+                <!-- Left Pane: Text (50%) -->
+                <div class="h-full overflow-y-auto p-6" style="width: 50%;">
+                    <div id="readingContent2" class="prose max-w-none">
+                        <!-- Reading text injected by JS -->
+                    </div>
+                </div>
+                
+                <!-- Resizer -->
+                <div class="resizer flex items-center justify-center relative">
+                    <div class="h-8 w-1 bg-gray-400 rounded-full"></div>
+                </div>
+                
+                <!-- Right Pane: Exercises (50%) -->
+                <div class="h-full flex-1 overflow-y-auto p-6 bg-gray-50">
+                    
+                    <!-- Ex 1: Match -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
+                        <h3 class="text-xl font-bold text-blue-700 mb-2">Exercise 1: Drag-and-Drop Matching</h3>
+                        <p class="text-gray-600 mb-4 text-sm">Kéo các từ vựng vào đúng phần mô tả ý nghĩa tiếng Việt.</p>
+                        
+                        <div id="ex1-bank" class="flex flex-wrap gap-2 p-4 bg-gray-100 rounded-lg min-h-[60px] drop-zone border-2 border-dashed border-gray-300 mb-6" ondrop="drop(event)" ondragover="allowDrop(event)">
+                            <div id="w1" class="drag-item bg-blue-100 text-blue-800 px-4 py-2 rounded shadow-sm font-medium" draggable="true" ondragstart="drag(event)">1. mass media</div>
+                            <div id="w2" class="drag-item bg-blue-100 text-blue-800 px-4 py-2 rounded shadow-sm font-medium" draggable="true" ondragstart="drag(event)">2. print media</div>
+                            <div id="w3" class="drag-item bg-blue-100 text-blue-800 px-4 py-2 rounded shadow-sm font-medium" draggable="true" ondragstart="drag(event)">3. TV broadcast</div>
+                            <div id="w4" class="drag-item bg-blue-100 text-blue-800 px-4 py-2 rounded shadow-sm font-medium" draggable="true" ondragstart="drag(event)">4. social media platform</div>
+                            <div id="w5" class="drag-item bg-blue-100 text-blue-800 px-4 py-2 rounded shadow-sm font-medium" draggable="true" ondragstart="drag(event)">5. target audiences</div>
+                            <div id="w6" class="drag-item bg-blue-100 text-blue-800 px-4 py-2 rounded shadow-sm font-medium" draggable="true" ondragstart="drag(event)">6. influence</div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex flex-col sm:flex-row gap-4 items-center bg-gray-50 p-3 rounded">
+                                <div id="ex1_ans_A" class="drop-zone flex-shrink-0 w-full sm:w-48 bg-white border-2 border-dashed border-gray-300 rounded flex items-center justify-center p-2" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                                <p class="text-sm text-gray-700 flex-1"><strong>A.</strong> Nhóm người hay khách hàng cụ thể mà một chương trình hoặc quảng cáo hướng tới.</p>
+                            </div>
+                            <div class="flex flex-col sm:flex-row gap-4 items-center bg-gray-50 p-3 rounded">
+                                <div id="ex1_ans_B" class="drop-zone flex-shrink-0 w-full sm:w-48 bg-white border-2 border-dashed border-gray-300 rounded flex items-center justify-center p-2" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                                <p class="text-sm text-gray-700 flex-1"><strong>B.</strong> Nền tảng kỹ thuật số cho phép người dùng tạo và chia sẻ nội dung hoặc tham gia mạng xã hội.</p>
+                            </div>
+                            <div class="flex flex-col sm:flex-row gap-4 items-center bg-gray-50 p-3 rounded">
+                                <div id="ex1_ans_C" class="drop-zone flex-shrink-0 w-full sm:w-48 bg-white border-2 border-dashed border-gray-300 rounded flex items-center justify-center p-2" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                                <p class="text-sm text-gray-700 flex-1"><strong>C.</strong> Các phương tiện truyền thông đại chúng nhằm tiếp cận lượng khán giả cực kỳ lớn.</p>
+                            </div>
+                            <div class="flex flex-col sm:flex-row gap-4 items-center bg-gray-50 p-3 rounded">
+                                <div id="ex1_ans_D" class="drop-zone flex-shrink-0 w-full sm:w-48 bg-white border-2 border-dashed border-gray-300 rounded flex items-center justify-center p-2" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                                <p class="text-sm text-gray-700 flex-1"><strong>D.</strong> Hành động tác động, gây ảnh hưởng lên suy nghĩ, hành vi hoặc thói quen của ai đó.</p>
+                            </div>
+                            <div class="flex flex-col sm:flex-row gap-4 items-center bg-gray-50 p-3 rounded">
+                                <div id="ex1_ans_E" class="drop-zone flex-shrink-0 w-full sm:w-48 bg-white border-2 border-dashed border-gray-300 rounded flex items-center justify-center p-2" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                                <p class="text-sm text-gray-700 flex-1"><strong>E.</strong> Các ấn phẩm truyền thông được in ra trên giấy như báo giấy, tạp chí, tờ rơi.</p>
+                            </div>
+                            <div class="flex flex-col sm:flex-row gap-4 items-center bg-gray-50 p-3 rounded">
+                                <div id="ex1_ans_F" class="drop-zone flex-shrink-0 w-full sm:w-48 bg-white border-2 border-dashed border-gray-300 rounded flex items-center justify-center p-2" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                                <p class="text-sm text-gray-700 flex-1"><strong>F.</strong> Một chương trình hoặc bản tin được phát sóng trên truyền hình.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ex 2: Collocation -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
+                        <h3 class="text-xl font-bold text-blue-700 mb-2">Exercise 2: Collocation Hunt</h3>
+                        <p class="text-gray-600 mb-4 text-sm">Tìm danh từ đi sau các động từ dưới đây để tạo thành một cụm từ hoàn chỉnh, sau đó ghi lại nghĩa của cụm từ.</p>
+                        
+                        <div class="space-y-4">
+                            <!-- Items mapped by JS -->
+                            <div id="ex2-container"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Ex 3: Definitions -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
+                        <h3 class="text-xl font-bold text-blue-700 mb-2">Exercise 3: Match the Vocabulary</h3>
+                        <p class="text-gray-600 mb-4 text-sm">Điền từ đúng vào ô trống dựa vào định nghĩa tiếng Anh.</p>
+                        <div class="mb-4 text-sm font-medium text-gray-600">
+                            Word list: <span class="text-blue-600">mass media, print media, TV broadcast, streaming service, promote, influence, broadcast, target audiences, persuade.</span>
+                        </div>
+                        <div class="space-y-3 text-gray-800" id="ex3-container">
+                            <!-- JS injected -->
+                        </div>
+                    </div>
+
+                    <!-- Ex 4: Fill Blanks -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xl font-bold text-blue-700 mb-2">Exercise 4: Fill-in-the-Blanks</h3>
+                        
+                        <div id="ex4-bank" class="flex flex-wrap gap-2 p-4 bg-gray-100 rounded-lg min-h-[60px] drop-zone border-2 border-dashed border-gray-300 mb-6" ondrop="drop(event)" ondragover="allowDrop(event)">
+                            <div id="b1" class="drag-item bg-green-100 text-green-800 px-3 py-1 rounded font-medium" draggable="true" ondragstart="drag(event)">streaming service</div>
+                            <div id="b2" class="drag-item bg-green-100 text-green-800 px-3 py-1 rounded font-medium" draggable="true" ondragstart="drag(event)">broadcast</div>
+                            <div id="b3" class="drag-item bg-green-100 text-green-800 px-3 py-1 rounded font-medium" draggable="true" ondragstart="drag(event)">influence</div>
+                            <div id="b4" class="drag-item bg-green-100 text-green-800 px-3 py-1 rounded font-medium" draggable="true" ondragstart="drag(event)">target audiences</div>
+                            <div id="b5" class="drag-item bg-green-100 text-green-800 px-3 py-1 rounded font-medium" draggable="true" ondragstart="drag(event)">persuade</div>
+                            <div id="b6" class="drag-item bg-green-100 text-green-800 px-3 py-1 rounded font-medium" draggable="true" ondragstart="drag(event)">print media</div>
+                            <div id="b7" class="drag-item bg-green-100 text-green-800 px-3 py-1 rounded font-medium" draggable="true" ondragstart="drag(event)">promote</div>
+                            <div id="b8" class="drag-item bg-green-100 text-green-800 px-3 py-1 rounded font-medium" draggable="true" ondragstart="drag(event)">TV broadcast</div>
+                            <div id="b9" class="drag-item bg-green-100 text-green-800 px-3 py-1 rounded font-medium" draggable="true" ondragstart="drag(event)">mass media</div>
+                        </div>
+
+                        <div class="space-y-4" id="ex4-container">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: LISTENING -->
+        <section id="section-2" class="section-container hidden h-full w-full absolute top-0 left-0 overflow-y-auto p-8 bg-white transition-opacity duration-300">
+            <div class="max-w-4xl mx-auto">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2"><i class="fas fa-headphones text-blue-500 mr-2"></i> Listening Practice</h2>
+                    <p class="text-gray-600 text-lg">Listen to the conversation (Media & Advertising 1.1) and fill in each blank. The text box will resize as you type.</p>
+                </div>
+                
+                <div class="bg-gray-50 border border-gray-200 rounded-2xl p-8 shadow-sm text-lg leading-loose text-gray-800">
+                    <p class="mb-4">
+                        <strong class="text-blue-700">Chloe:</strong> Hey Sam, look at that big 
+                        <input type="text" id="list_q1" class="inline-input" placeholder="..." oninput="resizeInput(this)"> 
+                        over there! It’s a classic advertisement. Honestly, it makes me miss the old days of the film industry when we went to the cinema every weekend.
+                    </p>
+                    <p class="mb-4">
+                        <strong class="text-green-700">Sam:</strong> Haha, yes. But let’s be honest, Chloe. No one looks at an ad on the street to buy things anymore. Today, if a company wants to promote a product, they just use a social media platform like TikTok or Facebook.
+                    </p>
+                    <p class="mb-4">
+                        <strong class="text-blue-700">Chloe:</strong> I know. Everything is online now. But I still love print media. I like buying a real magazine and looking at a beautiful 
+                        <input type="text" id="list_q2" class="inline-input" placeholder="..." oninput="resizeInput(this)"> 
+                        on the pages. It feels better than scrolling on a smartphone screen.
+                    </p>
+                    <p class="mb-4">
+                        <strong class="text-green-700">Sam:</strong> I understand, but the mass media is different now. Companies do not want to show ads to everyone. They want to target their marketing. They study data to find their exact 
+                        <input type="text" id="list_q3" class="inline-input" placeholder="..." oninput="resizeInput(this)"> 
+                        the right people who really want to buy their products.
+                    </p>
+                    <p class="mb-4">
+                        <strong class="text-blue-700">Chloe:</strong> That is true, but technology is sometimes too smart! Modern apps can influence our shopping habits so easily.
+                    </p>
+                    <p class="mb-4">
+                        <strong class="text-green-700">Sam:</strong> Exactly! And think about a popular 
+                        <input type="text" id="list_q4" class="inline-input" placeholder="..." oninput="resizeInput(this)"> 
+                        on internet. They can persuade millions of followers to buy a product just by making a short video. We trust them because they feel like real friends.
+                    </p>
+                    <p class="mb-4">
+                        <strong class="text-blue-700">Chloe:</strong> You are right. That is why traditional 
+                        <input type="text" id="list_q5" class="inline-input" placeholder="..." oninput="resizeInput(this)"> 
+                        is losing many viewers. Why do we need to wait for a station to broadcast a show at 7 PM? We can watch everything on a streaming service like Netflix anytime.
+                    </p>
+                    <p>
+                        <strong class="text-green-700">Sam:</strong> 
+                        <input type="text" id="list_q6" class="inline-input" placeholder="..." oninput="resizeInput(this)"> 
+                        ! Modern advertising is very different now.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: SPEAKING -->
+        <section id="section-3" class="section-container hidden h-full w-full absolute top-0 left-0 overflow-y-auto p-8 bg-gray-50 transition-opacity duration-300">
+            <div class="max-w-6xl mx-auto">
+                <div class="mb-8 text-center">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2"><i class="fas fa-microphone text-blue-500 mr-2"></i> Speaking Practice</h2>
+                    <p class="text-gray-600 text-lg">Answer the questions and describe the pictures using acquired vocabulary.</p>
+                </div>
+
+                <div id="speaking-container" class="space-y-12 pb-20">
+                    <!-- Dynamic content injected via JS -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Controls -->
+    <footer class="bg-white border-t p-4 z-20 flex-shrink-0 flex justify-between items-center px-8 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <button id="prevBtn" onclick="navigate(-1)" class="px-6 py-2 rounded-lg font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 transition opacity-50 cursor-not-allowed">
+            <i class="fas fa-arrow-left mr-2"></i> Previous
+        </button>
+        <button id="submitBtn" onclick="submitWork()" class="hidden px-8 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg transform hover:-translate-y-0.5 transition flex items-center">
+            <span>Submit Work</span> <i class="fas fa-check-circle ml-2"></i>
+        </button>
+        <button id="nextBtn" onclick="navigate(1)" class="px-6 py-2 rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700 transition">
+            Next <i class="fas fa-arrow-right ml-2"></i>
+        </button>
+    </footer>
+
+    <!-- Result Modal -->
+    <div id="resultModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center transform scale-95 transition-transform" id="modalContent">
+            <div class="text-green-500 text-6xl mb-4 animate-bounce"><i class="fas fa-check-circle"></i></div>
+            <h3 class="text-3xl font-bold text-gray-800 mb-2">Awesome Job!</h3>
+            <p class="text-gray-600 mb-6">Your work has been safely recorded. Copy this link to send to your teacher or edit later.</p>
+            <div class="relative mb-6">
+                <input type="text" id="shareUrl" class="w-full pl-4 pr-12 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:border-green-400 font-mono text-sm" readonly>
+                <button onclick="copyUrl()" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-blue-500 transition p-2">
+                    <i class="fas fa-copy text-xl"></i>
+                </button>
+            </div>
+            <div class="flex gap-4 justify-center">
+                <button onclick="closeModal()" class="w-full bg-gray-100 text-gray-800 px-6 py-3 rounded-xl hover:bg-gray-200 transition font-bold">
+                    Edit Again
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. CẤU HÌNH API GOOGLE APPS SCRIPT
+        // ==========================================
+        // Thay link dưới đây bằng link Web App bạn lấy được ở bước Deploy Google Apps Script
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyGvr0W6YXfMmz3MMw9xnvcQml7jvwiv-URxkvkumec9edjJZ6WuIhOWFjNJSkcMXae4w/exec';
+        // Tên tab lưu trữ trong Google Sheet
+        const SITE_ID = 'Media_Advertising_01';
+
+        // ==========================================
+        // 2. DỮ LIỆU HIỂN THỊ (DATA)
+        // ==========================================
+        const readingHTMLText = `
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">How Advertising Works Today and How It Influences Us</h2>
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-r-xl shadow-sm text-gray-800 leading-relaxed text-lg space-y-4">
+                <p>In the modern world, <strong>mass media</strong> is everywhere. In the past, companies used <strong>traditional</strong> ways to <strong>introduce their products to people</strong> and <strong>promote their products</strong>. People used to get information from a <strong>TV broadcast</strong> or the <strong>print media</strong>, such as newspapers and magazines. Big companies also put their <strong>commercials</strong> on the <strong>billboard</strong> by the road to show their products. At that time, a <strong>TV Commercial</strong> was one of the best ways to <strong>influence</strong> people and reach a large <strong>target audience</strong>.</p>
+                
+                <p>Today, technology has changed the way companies <strong>promote their products</strong>. Many people watch a <strong>streaming service</strong> instead of traditional TV. They also <strong>scroll through their favorite social media platform</strong> every day, such as TikTok or Facebook. Companies do not show the same ad to everyone anymore. They study their customers and <strong>target</strong> the right <strong>audience</strong>. This helps them sell more products.</p>
+                
+                <p>This digital change has also changed how companies <strong>influence our shopping habits</strong>. Many brands pay a popular <strong>influencer</strong> to talk about and recommend their products to the audiences. People often trust these influencers because they act like our friends and provide feedback that seems real. This way, these influencers can <strong>persuade</strong> people to buy the products easily. Of course, a <strong>radio station</strong> can still <strong>broadcast</strong> a traditional ad, but many companies now make online videos because they can reach more people. Today, <strong>advertising</strong> is smarter and more effective than before.</p>
+            </div>
+        `;
+
+        const ex2Data = [
+            { v: "introduce", m: "Giới thiệu ..." },
+            { v: "recommend", m: "Khuyên dùng ..." },
+            { v: "promote", m: "Quảng bá/Thúc đẩy ..." },
+            { v: "scroll through", m: "Lướt ..." },
+            { v: "target", m: "Nhắm mục tiêu..." },
+            { v: "influence", m: "Ảnh hưởng/Tác động ..." },
+            { v: "persuade", m: "Thuyết phục ..." },
+            { v: "broadcast", m: "Phát sóng ..." },
+            { v: "buy", m: "Mua ..." }
+        ];
+
+        const ex3Defs = [
+            "(v): To send out programmes on television or radio.",
+            "(n): Newspapers, magazines, and other journals that are printed on paper.",
+            "(n): The specific groups of people that an advertisement or product is aimed at.",
+            "(v): To encourage people to like, buy, or use something; to publicize.",
+            "(n): All the tools (TV, radio, web) used to communicate with a very large number of people.",
+            "(v): To make someone do or believe something by giving them good reasons.",
+            "(n): A television program or announcement sent out over the television network.",
+            "(v): To have an effect on the character, development, or behavior of someone.",
+            "(n): An online provider of entertainment (movies, music) that plays continuously directly over the internet."
+        ];
+
+        const ex4Sentences = [
+            "1. Many young people prefer using a [DROP] like Netflix instead of watching traditional cable television.",
+            "2. The government plans to [DROP] the health announcement live on all radio stations tonight.",
+            "3. Advertisements have a powerful power to [DROP] what clothes teenagers choose to buy.",
+            "4. Before launching a new toy, the company always researches its [DROP], which are usually kids and parents.",
+            "5. It is difficult for old companies to [DROP] the younger generation to buy products using old methods.",
+            "6. Digital advertising is growing fast, causing a huge decline in [DROP] like newspapers and physical magazines.",
+            "7. Fast-food chains often use famous athletes to [DROP] their new burgers and drinks.",
+            "8. Millions of families gather in front of the television every evening to watch the 7 PM national [DROP].",
+            "9. In today's digital age, the [DROP] includes not just television and radio, but also internet news and podcasts."
+        ];
+
+        const speakingData = [
+            {
+                img: "https://lh3.googleusercontent.com/d/1VAecSqXR2tihDU6_k4YuoRHTNqbVRQHG",
+                qs: [
+                    { q: "Is it a quiet town or a busy city? What do you see on the sides of the buildings?", hint: "" },
+                    { q: "Is that a small poster or a huge billboard? What product is it trying to promote?", hint: "" },
+                    { q: "Who is the target audience for this billboard?", hint: "" },
+                    { q: "Who is 'Foodie Jen'? Is she a traditional actor or a famous food influencer?", hint: "" }
+                ]
+            },
+            {
+                img: "https://lh3.googleusercontent.com/d/1Lh4pLSreHKUDS7zYrqHFaxIJBVmg5AxB",
+                qs: [
+                    { q: "Look at the picture, what time of day is it, and what are the family doing?", hint: "different, types of mass media" },
+                    { q: "What is showing on the big screen of television right now? What kind of information do people usually get after watching this show?", hint: "news = current affairs, updated policies, politic and economic news." },
+                    { q: "What is the woman sitting on the sofa doing, and what is she holding in her hands?", hint: "without the Internet; reduce the dependence on the Internet; keep / store .. ; more reliable; verified; published." },
+                    { q: "What are the rest of the younger family members doing?", hint: "scroll, digital news." },
+                    { q: "What are the disadvantages of modern media such as Facebook, Tiktok or even digital news?", hint: "false information, online scams, overpromote a product" }
+                ]
+            },
+            {
+                img: "https://lh3.googleusercontent.com/d/1ZyNKfZAFuWzpAsPE8tqFFZj3UY31qrf6",
+                qs: [
+                    { q: "What are the people in the office doing, and what kind of project are they working on?", hint: "design, campaign, promote" },
+                    { q: "Look at the white board and the big monitor. Who do you think is their target audience?", hint: "" },
+                    { q: "Do these audiences spend more time watching a TV broadcast or scrolling online?", hint: "" },
+                    { q: "Do young people look at a billboard on the street or check their phones more?", hint: "too focus on + N, ignore" },
+                    { q: "In your opinion, why is a digital commercial on TikTok/Instagram more effective for this project than a traditional roadside billboard?", hint: "creative methods; attractive; young people; social media; reach more people." }
+                ]
+            },
+            {
+                img: "https://lh3.googleusercontent.com/d/1rdfLYu1eoGjZcqf0MXAYKv02wJQg9egz",
+                qs: [
+                    { q: "What is the girl doing, is she reading a book or scrolling through her phone?", hint: "" },
+                    { q: "Which social media platform do you think she is using?", hint: "" },
+                    { q: "Who is the girl on the smartphone screen, and what is her job? What is she trying to do?", hint: "influence, promote, introduce, persuade" },
+                    { q: "Look at the shoes and the 'Mua Ngay' (Buy Now) button. Who is the target audience for this online commercial? Are these shoes for old people or teenagers?", hint: "care about, appearance, fashion" },
+                    { q: "How does the influencer persuade the girl to buy the sneakers? Does this video influence her shopping habits?", hint: "review, give real feedback." },
+                    { q: "Why do modern shoe brands prefer using this method instead of a traditional TV broadcast or print media?", hint: "cheaper, widespread, realistic" }
+                ]
+            }
+        ];
+
+        let currentSection = 0;
+
+        // ==========================================
+        // 3. KHỞI TẠO GIAO DIỆN VÀ RENDER
+        // ==========================================
+        function initApp() {
+            // Đổ HTML
+            document.getElementById('readingContent1').innerHTML = readingHTMLText;
+            document.getElementById('readingContent2').innerHTML = readingHTMLText;
+
+            // Render Ex 2 (Có gán ID)
+            const ex2Container = document.getElementById('ex2-container');
+            ex2Data.forEach((item, idx) => {
+                ex2Container.innerHTML += `
+                    <div class="flex flex-col sm:flex-row items-center gap-3">
+                        <span class="w-6 text-gray-500 font-medium">${idx + 1}.</span>
+                        <strong class="text-blue-800 w-28 text-right">${item.v}</strong>
+                        <input id="ex2_noun_${idx}" type="text" class="flex-1 border rounded p-2 focus:ring-2 focus:ring-blue-400 focus:outline-none" placeholder="điền danh từ vào đây...">
+                        <span class="text-gray-400 mx-1">➔</span>
+                        <input id="ex2_meaning_${idx}" type="text" class="flex-1 border border-gray-200 bg-gray-50 rounded p-2 focus:bg-white focus:outline-none" placeholder="${item.m}">
+                    </div>
+                `;
+            });
+
+            // Render Ex 3 (Có gán ID)
+            const ex3Container = document.getElementById('ex3-container');
+            ex3Defs.forEach((def, idx) => {
+                ex3Container.innerHTML += `
+                    <div class="flex items-start gap-3 bg-gray-50 p-2 rounded">
+                        <span class="w-6 text-gray-500 pt-1">${idx + 1}.</span>
+                        <input id="ex3_ans_${idx}" type="text" class="w-40 border-b-2 border-gray-400 bg-transparent focus:border-blue-500 focus:outline-none text-center font-medium text-blue-700 px-2 py-1" placeholder="...">
+                        <p class="flex-1 pt-1">${def}</p>
+                    </div>
+                `;
+            });
+
+            // Render Ex 4 (Có gán ID)
+            const ex4Container = document.getElementById('ex4-container');
+            ex4Sentences.forEach((sentence, idx) => {
+                const parts = sentence.split('[DROP]');
+                ex4Container.innerHTML += `
+                    <div class="bg-gray-50 p-3 rounded text-gray-800 leading-relaxed flex flex-wrap items-center gap-2">
+                        <span>${parts[0]}</span>
+                        <div id="ex4_drop_${idx}" class="drop-zone inline-flex min-w-[120px] h-[34px] border-b-2 border-dashed border-gray-400 bg-white align-middle" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                        <span>${parts[1]}</span>
+                    </div>
+                `;
+            });
+
+            // Render Speaking (Có gán ID)
+            const speakingContainer = document.getElementById('speaking-container');
+            speakingData.forEach((item, idx) => {
+                let questionsHtml = '';
+                item.qs.forEach((qObj, qIdx) => {
+                    const hintId = `hint-${idx}-${qIdx}`;
+                    const hintBtn = qObj.hint ? `
+                        <button onclick="toggleHint('${hintId}')" class="text-yellow-600 hover:text-yellow-700 mt-1 mb-2 flex items-center text-sm font-semibold transition">
+                            <i class="fas fa-lightbulb mr-1"></i> Hint
+                        </button>
+                        <div id="${hintId}" class="hidden bg-yellow-100 text-yellow-900 text-sm p-3 rounded-lg border border-yellow-300 mb-3 shadow-inner">
+                            ${qObj.hint}
+                        </div>
+                    ` : '<div class="h-2"></div>';
+
+                    questionsHtml += `
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-4">
+                            <p class="font-bold text-gray-800 text-lg mb-1">${qObj.q}</p>
+                            ${hintBtn}
+                            <textarea id="speak_q_${idx}_${qIdx}" class="w-full border rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-400 focus:outline-none bg-gray-50 focus:bg-white transition" rows="2" placeholder="Write your ideas here..."></textarea>
+                        </div>
+                    `;
+                });
+
+                speakingContainer.innerHTML += `
+                    <div class="flex flex-col lg:flex-row gap-8 bg-white p-6 rounded-2xl shadow-md border border-gray-200 items-start">
+                        <div class="w-full lg:w-[50%] flex-shrink-0 lg:sticky lg:top-4">
+                            <img src="${item.img}" class="w-full rounded-xl shadow-md object-cover border border-gray-100" alt="Speaking practice image">
+                        </div>
+                        <div class="w-full lg:w-[50%] flex flex-col">
+                            ${questionsHtml}
+                        </div>
+                    </div>
+                `;
+            });
+
+            setupResizers();
+            updateNavUI();
+            
+            // SAU KHI RENDER XONG, KIỂM TRA XEM CÓ PHẢI ĐANG MỞ LINK CŨ KHÔNG ĐỂ TẢI DỮ LIỆU
+            checkUrlForData();
+        }
+
+        // ==========================================
+        // 4. LOGIC LƯU VÀ TẢI DỮ LIỆU BẰNG API
+        // ==========================================
+
+        // Gom toàn bộ đáp án trên giao diện thành 1 Object
+        function collectData() {
+            const data = {};
+            data.studentName = document.getElementById('studentName').value;
+            data.vocabNotes = document.getElementById('vocabNotes').value;
+
+            // 1. Lấy tất cả các thẻ input/textarea có ID bắt đầu bằng prefix của chúng ta
+            const textInputs = document.querySelectorAll('textarea[id^="read_"], input[id^="ex2_"], input[id^="ex3_"], input[id^="list_"], textarea[id^="speak_"]');
+            textInputs.forEach(input => {
+                data[input.id] = input.value;
+            });
+
+            // 2. Lấy đáp án các ô kéo thả (Drag-drop)
+            const dropZones = document.querySelectorAll('.drop-zone[id^="ex1_ans_"], .drop-zone[id^="ex4_drop_"]');
+            dropZones.forEach(zone => {
+                data[zone.id] = zone.children.length > 0 ? zone.children[0].innerText : "";
+            });
+
+            return data;
+        }
+
+        // Điền dữ liệu tải về từ Google Sheet lên lại giao diện
+        function populateData(data) {
+            if(data.studentName) document.getElementById('studentName').value = data.studentName;
+            if(data.vocabNotes) document.getElementById('vocabNotes').value = data.vocabNotes;
+
+            // 1. Điền Text Inputs
+            const textInputs = document.querySelectorAll('textarea[id^="read_"], input[id^="ex2_"], input[id^="ex3_"], input[id^="list_"], textarea[id^="speak_"]');
+            textInputs.forEach(input => {
+                if(data[input.id] !== undefined) {
+                    input.value = data[input.id];
+                    // Nếu là ô input listening, gọi hàm auto-resize
+                    if(input.classList.contains('inline-input')) resizeInput(input);
+                }
+            });
+
+            // 2. Điền ô kéo thả (Tìm lại thẻ trong bank và nhét vào drop-zone)
+            const dropZones = document.querySelectorAll('.drop-zone[id^="ex1_ans_"], .drop-zone[id^="ex4_drop_"]');
+            dropZones.forEach(zone => {
+                if(data[zone.id]) {
+                    // Xác định đang ở Ex 1 hay Ex 4 để tìm trong bank tương ứng
+                    const bankId = zone.id.startsWith('ex1') ? '#ex1-bank' : '#ex4-bank';
+                    const itemsInBank = document.querySelectorAll(`${bankId} .drag-item`);
+                    
+                    itemsInBank.forEach(item => {
+                        if(item.innerText === data[zone.id]) {
+                            zone.appendChild(item); // Nhấc từ bank vào ô đáp án
+                        }
+                    });
+                }
+            });
+        }
+
+        // Kiểm tra URL và tải dữ liệu cũ (nếu có id=...)
+        function checkUrlForData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const studentId = urlParams.get('id');
+            
+            // Nếu có ID và SCRIPT_URL đã được cấu hình
+            if (studentId && SCRIPT_URL && SCRIPT_URL !== 'DÁN_LINK_WEB_APP_Ở_BƯỚC_2_VÀO_ĐÂY') {
+                document.getElementById('studentName').value = "Đang tải dữ liệu...";
+                
+                fetch(`${SCRIPT_URL}?action=load&siteId=${SITE_ID}&shortId=${studentId}`)
+                .then(res => res.json())
+                .then(response => {
+                    if (response.status === 'success') {
+                        populateData(response.data);
+                    } else {
+                        alert('Lỗi tải bài: ' + response.message);
+                        document.getElementById('studentName').value = "";
+                    }
+                })
+                .catch(err => {
+                    console.error("Lỗi khi tải dữ liệu:", err);
+                    alert("Không thể kết nối đến máy chủ.");
+                    document.getElementById('studentName').value = "";
+                });
+            }
+        }
+
+        // Hành động Submit: Gọi API lưu lên Google Sheet
+        function submitWork() {
+            // Validate sơ bộ
+            if(!document.getElementById('studentName').value) {
+                alert("Vui lòng nhập tên của bạn ở góc phải màn hình trước khi nộp bài!");
+                return;
+            }
+
+            const btn = document.getElementById('submitBtn');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<span>Saving...</span> <i class="fas fa-spinner fa-spin ml-2"></i>';
+            btn.disabled = true;
+
+            const allData = collectData();
+
+            // Nếu bạn chưa thay SCRIPT_URL, sẽ chạy code giả lập (tránh lỗi)
+            if(SCRIPT_URL === 'DÁN_LINK_WEB_APP_Ở_BƯỚC_2_VÀO_ĐÂY') {
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.disabled = false;
+                    const fakeHash = btoa(allData.studentName + Date.now()).substring(0, 6);
+                    showSuccessModal(fakeHash);
+                }, 1000);
+                return;
+            }
+
+            // Gọi Goolge Apps Script
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    action: 'save',
+                    siteId: SITE_ID,
+                    data: allData
+                })
+            })
+            .then(res => res.json())
+            .then(response => {
+                if(response.status === 'success') {
+                    showSuccessModal(response.shortId);
+                } else {
+                    alert('Lỗi máy chủ: ' + response.message);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Lỗi kết nối API. Vui lòng kiểm tra lại cấu hình.');
+            })
+            .finally(() => {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+            });
+        }
+
+        function showSuccessModal(shortId) {
+            // Cập nhật lại thanh url của modal chia sẻ
+            const cleanUrl = window.location.href.split('?')[0];
+            document.getElementById('shareUrl').value = cleanUrl + "?id=" + shortId;
+            
+            // Cập nhật cả thanh URL của trình duyệt (tuỳ chọn, giúp copy link trên thanh url dễ hơn)
+            window.history.pushState({}, '', cleanUrl + "?id=" + shortId);
+            
+            const modal = document.getElementById('resultModal');
+            const modalContent = document.getElementById('modalContent');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100');
+            }, 10);
+        }
+
+        // ==========================================
+        // 5. CÁC HÀM TIỆN ÍCH (UI & INTERACTION)
+        // ==========================================
+        function setupResizers() {
+            const resizers = document.querySelectorAll('.resizer');
+            resizers.forEach(resizer => {
+                const leftPane = resizer.previousElementSibling;
+                let isDown = false;
+                
+                resizer.addEventListener('mousedown', (e) => {
+                    isDown = true;
+                    document.body.style.cursor = 'col-resize';
+                    e.preventDefault();
+                });
+                
+                document.addEventListener('mouseup', () => {
+                    isDown = false;
+                    document.body.style.cursor = 'default';
+                });
+                
+                document.addEventListener('mousemove', (e) => {
+                    if (!isDown) return;
+                    const container = leftPane.parentElement;
+                    let newWidth = (e.clientX / container.clientWidth) * 100;
+                    if (newWidth < 20) newWidth = 20;
+                    if (newWidth > 80) newWidth = 80;
+                    leftPane.style.width = newWidth + '%';
+                });
+            });
+        }
+
+        function resizeInput(el) { el.style.width = (el.value.length + 4) + 'ch'; }
+        
+        function toggleHint(hintId) {
+            const hintEl = document.getElementById(hintId);
+            hintEl.classList.toggle('hidden');
+        }
+
+        function allowDrop(ev) { ev.preventDefault(); ev.currentTarget.classList.add('hover'); }
+        function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function drop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.remove('hover');
+            var data = ev.dataTransfer.getData("text");
+            var draggedEl = document.getElementById(data);
+            
+            if (draggedEl && ev.currentTarget.classList.contains('drop-zone')) {
+                if (ev.currentTarget.children.length > 0 && !ev.currentTarget.id.includes('bank')) {
+                    const existingChild = ev.currentTarget.children[0];
+                    const bankId = existingChild.id.startsWith('w') ? 'ex1-bank' : 'ex4-bank';
+                    document.getElementById(bankId).appendChild(existingChild);
+                }
+                ev.currentTarget.appendChild(draggedEl);
+            }
+        }
+        document.addEventListener('dragleave', (ev) => {
+            if(ev.target.classList && ev.target.classList.contains('drop-zone')) ev.target.classList.remove('hover');
+        });
+
+        function goToSection(index) {
+            document.getElementById(`section-${currentSection}`).classList.add('hidden');
+            currentSection = index;
+            document.getElementById(`section-${currentSection}`).classList.remove('hidden');
+            updateNavUI();
+        }
+
+        function navigate(dir) {
+            let newSection = currentSection + dir;
+            if (newSection >= 0 && newSection <= 3) goToSection(newSection);
+        }
+
+        function updateNavUI() {
+            for (let i = 0; i < 4; i++) {
+                const tab = document.getElementById(`tab-${i}`);
+                if (i === currentSection) tab.className = "flex-1 py-3 text-center font-bold text-blue-600 border-b-4 border-blue-600 transition bg-blue-50/50";
+                else tab.className = "flex-1 py-3 text-center font-medium text-gray-500 hover:text-blue-500 transition border-b border-transparent";
+            }
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+
+            currentSection === 0 ? prevBtn.classList.add('opacity-50', 'cursor-not-allowed') : prevBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+            if (currentSection === 3) {
+                nextBtn.classList.add('hidden');
+                submitBtn.classList.remove('hidden');
+            } else {
+                nextBtn.classList.remove('hidden');
+                submitBtn.classList.add('hidden');
+            }
+        }
+
+        function copyNotes() {
+            const text = document.getElementById('vocabNotes').value;
+            if(!text) return;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.querySelector('button[onclick="copyNotes()"]');
+                const origHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                btn.classList.add('bg-green-200', 'text-green-800');
+                setTimeout(() => {
+                    btn.innerHTML = origHTML;
+                    btn.classList.remove('bg-green-200', 'text-green-800');
+                }, 2000);
+            });
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('resultModal');
+            const modalContent = document.getElementById('modalContent');
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 200);
+        }
+
+        function copyUrl() {
+            const urlInput = document.getElementById('shareUrl');
+            urlInput.select();
+            document.execCommand("copy");
+        }
+
+        // Khởi động
+        window.onload = initApp;
+
+    </script>
+</body>
+</html>
